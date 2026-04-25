@@ -21,14 +21,20 @@
 #
 # After running, visit:
 #   http://127.0.0.1:8000       -> root endpoint
-#   http://127.0.0.1:8000/docs  -> interactive Swagger UI
+#   http://127.0.0.1:8000/docs  -> interactive Swagger UI (all chapters visible here)
+#
+# Course structure:
+#   Chapter 1 -> main.py               (app setup, basic routes, mounting routers)
+#   Chapter 2 -> routers/items.py      (CRUD, Pydantic models, path parameters)
+#   Chapter 3 -> routers/items_v2.py   (HTTPException, query parameters)
 # =============================================================================
 
 from fastapi import FastAPI
 
-# Import the router we defined in a separate file.
-# Keeping routes in separate files keeps the codebase modular and scalable.
-from my_fastapi_project.routers.items import router as items_router
+# Each chapter lives in its own router file.
+# We import them here and mount them onto the main app below.
+from my_fastapi_project.routers.items import router as items_router        # Chapter 2
+from my_fastapi_project.routers.items_v2 import router as items_v2_router  # Chapter 3
 
 
 # -----------------------------------------------------------------------------
@@ -36,7 +42,7 @@ from my_fastapi_project.routers.items import router as items_router
 # -----------------------------------------------------------------------------
 # Think of `app` as the central hub of your entire API.
 # All routes and routers attach to this object.
-# The metadata below shows up in the auto-generated /docs page.
+# The title, description, and version show up in the /docs Swagger UI page.
 app = FastAPI(
     title="FastAPI Learning Course",
     description="A beginner-friendly project covering CRUD, Pydantic models, and Routers.",
@@ -72,16 +78,23 @@ async def health_check():
 
 
 # -----------------------------------------------------------------------------
-# Step 4: Mount the items router onto the main app
+# Step 4: Mount routers onto the main app
 # -----------------------------------------------------------------------------
-# Instead of defining every route in this file, we split them into routers.
-# `include_router()` attaches all routes from items_router to the app.
-#
-# The items router has prefix="/items", so the final routes become:
-#   GET    /items/        -> list all items
-#   POST   /items/        -> create an item
-#   GET    /items/{id}    -> get one item by ID
-#   PUT    /items/{id}    -> fully replace an item
-#   PATCH  /items/{id}    -> partially update an item
-#   DELETE /items/{id}    -> delete an item
+# Instead of writing all routes in this one file, we split them into routers.
+# `include_router()` attaches all routes from a router file to the app.
+# The order here determines the order they appear in /docs.
+
+# Chapter 2 routes: prefix="/items"
+#   GET    /items/      -> list all items
+#   POST   /items/      -> create an item
+#   GET    /items/{id}  -> get one item
+#   PUT    /items/{id}  -> fully replace an item
+#   PATCH  /items/{id}  -> partially update an item
+#   DELETE /items/{id}  -> delete an item
 app.include_router(items_router)
+
+# Chapter 3 routes: prefix="/v2/items"
+# Same CRUD routes but upgraded with:
+#   - HTTPException for proper error status codes
+#   - Query parameters for pagination (?skip=0&limit=10)
+app.include_router(items_v2_router)
