@@ -121,7 +121,29 @@ async def create_item(item: Item, session: Session = Depends(get_session)):
 
 
 # =============================================================================
-# CONCEPT 5: session.delete() - remove a row from the database
+# CONCEPT 5: Updating a row - fetch, modify fields, commit
+# =============================================================================
+# There is no session.update(). The pattern in SQLModel is:
+#   1. Fetch the existing row with session.get()
+#   2. Modify its fields directly on the Python object
+#   3. session.add(item) -> stages the updated object
+#   4. session.commit()  -> writes the changes to the database
+#   5. session.refresh(item) -> reloads the object with the latest DB state
+@router.put("/{item_id}")
+async def update_item(item_id: int, updated: Item, session: Session = Depends(get_session)):
+    item = session.get(Item, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    item.name = updated.name
+    item.price = updated.price
+    session.add(item)
+    session.commit()
+    session.refresh(item)
+    return item
+
+
+# =============================================================================
+# CONCEPT 6: session.delete() - remove a row from the database
 # =============================================================================
 # Pattern: fetch first, then delete.
 # Always check the item exists before trying to delete.
