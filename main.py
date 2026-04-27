@@ -28,6 +28,7 @@
 #   Chapter 2 -> routers/items.py      (CRUD, Pydantic models, path parameters)
 #   Chapter 3 -> routers/items_v2.py   (HTTPException, query parameters)
 #   Chapter 4 -> routers/items_v3.py   (real database, SQLModel, Depends)
+#   Chapter 5 -> routers/items_v4.py   (response models, filtering output data)
 # =============================================================================
 
 from contextlib import asynccontextmanager
@@ -36,6 +37,7 @@ from fastapi import FastAPI
 from my_fastapi_project.routers.items import router as items_router        # Chapter 2
 from my_fastapi_project.routers.items_v2 import router as items_v2_router  # Chapter 3
 from my_fastapi_project.routers.items_v3 import router as items_v3_router  # Chapter 4
+from my_fastapi_project.routers.items_v4 import router as items_v4_router  # Chapter 5
 from my_fastapi_project.database import create_db_and_tables
 
 
@@ -91,3 +93,6 @@ app.include_router(items_v2_router)
 
 # Chapter 4: prefix="/v3/items" -> real SQLite database, SQLModel, Depends()
 app.include_router(items_v3_router)
+
+# Chapter 5: prefix="/v4/items" -> response models
+app.include_router(items_v4_router)
