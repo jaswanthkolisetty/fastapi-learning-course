@@ -110,6 +110,23 @@ async def create_item(item: ItemCreate):
 
 
 # =============================================================================
+# BONUS: response_model_exclude_unset
+# =============================================================================
+# By default FastAPI includes all fields in ItemPublic even if they are None.
+# `response_model_exclude_unset=True` strips out fields that were never set.
+#
+# Example: if id is None because the item was not saved yet,
+# it will not appear in the response at all instead of showing as null.
+#
+# Useful when you want clean, minimal responses with no null clutter.
+@router.get("/sparse/{item_id}", response_model=ItemPublic, response_model_exclude_unset=True)
+async def get_item_sparse(_item_id: int):
+    # id is intentionally left unset to show response_model_exclude_unset in action.
+    # Compare this response with GET /v4/items/{item_id} to see the difference.
+    return Item(name="Laptop", price=999.99, secret_code="HIDDEN")
+
+
+# =============================================================================
 # CONCEPT 4: response_model on a list route
 # =============================================================================
 # To return a filtered list, wrap the model in List[].
