@@ -13,6 +13,7 @@ Every concept is explained with inline comments directly in the code. Read the s
 | 2 | `routers/items.py` | APIRouter, Pydantic models, full CRUD, path parameters, status codes, partial updates |
 | 3 | `routers/items_v2.py` | HTTPException, proper error status codes, query parameters, pagination |
 | 4 | `routers/items_v3.py` | SQLModel, real SQLite database, Depends(), session management |
+| 5 | `routers/items_v4.py` | Response models, filtering output, separate input/output schemas |
 
 ---
 
@@ -30,7 +31,8 @@ Fastapi_learn/
         ├── __init__.py
         ├── items.py                 # Chapter 2: full CRUD with fake dict DB
         ├── items_v2.py              # Chapter 3: HTTPException + query parameters
-        └── items_v3.py              # Chapter 4: real SQLite DB with SQLModel
+        ├── items_v3.py              # Chapter 4: real SQLite DB with SQLModel
+        └── items_v4.py              # Chapter 5: response models, output filtering
 ```
 
 ---
@@ -162,6 +164,22 @@ async def get_items(session: Session = Depends(get_session)):
 session.add(item)      # stage it
 session.commit()       # write to DB
 session.refresh(item)  # reload so auto-generated id is populated
+```
+
+**Response models: control what the client receives**
+
+```python
+class ItemPublic(BaseModel):
+    id: int
+    name: str
+    price: float
+    # secret_code is NOT here, so it never reaches the client
+
+@router.get("/{item_id}", response_model=ItemPublic)
+async def get_item(item_id: int):
+    return Item(id=1, name="Laptop", price=999.99, secret_code="hidden")
+    # FastAPI filters the response through ItemPublic before sending
+    # secret_code is silently dropped
 ```
 
 ---
