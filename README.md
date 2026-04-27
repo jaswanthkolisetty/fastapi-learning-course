@@ -195,9 +195,18 @@ async def get_item(item_id: int):
 
 ---
 
+**Chapter 5** - response models (output filtering)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v4/items/` | List all items, secret_code filtered out |
+| GET | `/v4/items/{id}` | Get one item, secret_code filtered out |
+| POST | `/v4/items/` | Create item, returns only public fields |
+
+---
+
 ## What is Coming Next
 
-- Response models (`response_model=`) to control what gets returned
-- PUT update route for the real database
+- Table relationships (items belonging to a user)
 - Authentication with JWT tokens
 - Deploying FastAPI to production
